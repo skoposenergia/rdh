@@ -1,0 +1,3 @@
+[submodule "sincrawl"]
+	path = sincrawl
+	url = https://github.com/mazucanti/sincrawl.git
