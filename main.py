@@ -5,6 +5,7 @@ from sincrawl.misc_sin.spiders.a_dona_aranha import RDH
 import pandas as pd
 from xlrd.biffh import XLRDError
 from os import unlink
+import psycopg2
 
 
 def download():
@@ -81,3 +82,27 @@ rdh.fillna(0, inplace=True)
 
 
 rdh.to_csv('rdh.csv')
+
+
+conn = psycopg2.connect(
+    "dbname='ENERGIA' host='192.168.0.251' user='script' password='batata'")
+cur = conn.cursor()
+
+cur.execute('create temp table rdh_tmp(posto integer, dia timestamp,\
+            vaz_dia integer, nivel_res float, vol_arm float, esp float,\
+            vaz_tur integer, ver integer,  otr	float,  dlf integer,\
+            tra integer, afl integer, inc integer, usos_con float,\
+            evp float, art integer,primary key(posto, dia));'
+            )
+with open("rdh.csv", 'r') as fp:
+
+    header = fp.readline()
+    cur.copy_from(fp, "rdh_tmp", ",", "-")
+
+
+cur.execute("insert into rdh_base\
+                select * from rdh_tmp\
+            on conflict (posto,dia) do nothing")
+conn.commit()
+cur.close()
+conn.close()
