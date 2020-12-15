@@ -90,7 +90,7 @@ cur = conn.cursor()
 
 cur.execute("delete from rdh;")
 
-with open("rdh.csv", 'r') as fp:
+with open("rdh.csv", 'r', encoding='utf-8') as fp:
 
     header = fp.readline()
     cur.copy_from(fp, "rdh", ",", "-")
